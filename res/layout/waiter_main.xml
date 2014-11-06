@@ -1,47 +1,42 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="match_parent"
-        android:layout_height="22dp"
-        android:background="#00adef"
-        android:gravity="center"
-        android:text="Đặt thực đơn"
-        android:textColor="#ffffff" />
-
-    <TabHost
+    android:orientation="vertical"
+    tools:context="com.pos.waiter.WaiterMainActivity" >
+    
+    <TabHost 
         android:id="@android:id/tabhost"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-        <LinearLayout
+        android:layout_height="match_parent">
+    
+        <LinearLayout 
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical" >
-
-            <TabWidget
+            android:orientation="vertical">
+            <TabWidget 
                 android:id="@android:id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content">
             </TabWidget>
-
-            <FrameLayout
+            <FrameLayout 
                 android:id="@android:id/tabcontent"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" >
-
-                <LinearLayout
+                android:layout_height="match_parent">
+                <LinearLayout 
                     android:id="@+id/tab1"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
+                    android:layout_height="match_parent">
 
-                    <include layout="@layout/zero" />
+                    <ExpandableListView
+                        android:id="@+id/expandableListView1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" >
+                    </ExpandableListView>
+                    
                 </LinearLayout>
-
+                
                 <LinearLayout
                     android:id="@+id/tab2"
                     android:layout_width="match_parent"
@@ -61,35 +56,37 @@
                             android:weightSum="2" >
 
                             <TextView
-                                android:id="@+id/textView1"
+                                android:id="@+id/textView"
                                 android:paddingLeft="5dp"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Bàn" />
+                                android:text="Bàn"
+                                android:textSize="18dp"
+                                android:textColor="@color/text_color" />
 
                             <Spinner
-                                android:id="@+id/spTable"
+                                android:id="@+id/spTable1"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1" />
+                                android:layout_height="45dp"
+                                android:layout_weight="1"
+                                android:textColor="@color/text_color"  />
                         </LinearLayout>
 
                         <ListView
                             android:id="@+id/lvOrder"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" >
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_color"  >
                         </ListView>
 
                         <Button
                             android:id="@+id/btAddOrder"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawableLeft="@drawable/white_add"
                             android:onClick="click_themmoi"
                             android:text="Thêm mới" />
                     </LinearLayout>
-
                     <LinearLayout
                         android:id="@+id/tab2_order_detail"
                         android:layout_width="match_parent"
@@ -121,17 +118,64 @@
                                 android:text="Hoàn thành" />
                         </RelativeLayout>
                     </LinearLayout>
+                    
                 </LinearLayout>
 
-                <LinearLayout
+                <LinearLayout 
                     android:id="@+id/tab3"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
+                    android:layout_height="match_parent"
+                    android:orientation="vertical" >
+                    <TextView
+                        android:id="@+id/textViewTable"
+                        android:paddingLeft="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Bàn"
+                        android:textColor="@color/text_color" />
 
-                    <include layout="@layout/zero" />
+                    <Spinner
+                        android:id="@+id/spTable2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+                    <TextView
+                        android:id="@+id/textViewTurn"
+                        android:paddingLeft="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Lượt"
+                        android:textColor="@color/text_color" />
+
+                    <Spinner
+                        android:id="@+id/spTurn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+                    <ListView 
+                        android:id="@+id/listDish"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+                    </ListView>
+                    
+                    <TextView
+                        android:id="@+id/textViewSum"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Tổng"
+                        android:textColor="@color/text_color"  />
+                    
+                    <Button
+                        android:id="@+id/btnSendBill"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Nhập hóa đơn"/>
                 </LinearLayout>
             </FrameLayout>
         </LinearLayout>
     </TabHost>
-
 </LinearLayout>
