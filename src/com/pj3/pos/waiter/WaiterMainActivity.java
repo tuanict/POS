@@ -44,6 +44,7 @@ public class WaiterMainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(R.layout.waiter_main);
         loadTab();
         tab2();
 		tab1();
@@ -129,7 +130,7 @@ public class WaiterMainActivity extends Activity {
 		lvOrder = (ListView) findViewById(R.id.lvOrder);
 		listOrderTempt.add("Lượt 1");
 		listOrderTempt.add("Lượt 2");
-		aaOrder = new OrderAdapter(this, R.layout.tab2_item_order,
+		aaOrder = new OrderAdapter(this, R.layout.waiter_tab2_item_order,
 				listOrderTempt);
 		lvOrder.setAdapter(aaOrder);
 
@@ -142,7 +143,7 @@ public class WaiterMainActivity extends Activity {
 		listOrderDetailTempt.add("Chanh leo");
 		listOrderDetailTempt.add("Cafe nâu");
 		listOrderDetailTempt.add("Mojito");
-		aaFood = new FoodAdapter(this, R.layout.tab2_item_food,
+		aaFood = new FoodAdapter(this, R.layout.waiter_tab2_item_food,
 				listOrderDetailTempt);
 		lv_order_detail.setAdapter(aaFood);
 	}

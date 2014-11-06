@@ -76,7 +76,7 @@ public class Tab1Adapter extends BaseExpandableListAdapter{
 		// TODO Auto-generated method stub
 		View gList = convertView;
 		if(gList == null){
-			gList = LayoutInflater.from(context).inflate(R.layout.tab1_item_table, parent,false);
+			gList = LayoutInflater.from(context).inflate(R.layout.waiter_tab1_item_table, parent,false);
 		}
 		TextView txtTable = (TextView)gList.findViewById(R.id.TextTable);
 		//CheckBox chkTable = (CheckBox)gList.findViewById(R.id.checkTab);
@@ -91,7 +91,7 @@ public class Tab1Adapter extends BaseExpandableListAdapter{
 		// TODO Auto-generated method stub
 		View chList = convertView;
 		if(chList == null){
-			chList = LayoutInflater.from(context).inflate(R.layout.tab1_sub_list_item_food, parent,false);
+			chList = LayoutInflater.from(context).inflate(R.layout.waiter_tab1_sub_list_item_food, parent,false);
 		}
 		ImageView imgFood = (ImageView)chList.findViewById(R.id.imgFood);
 		TextView txtFood = (TextView)chList.findViewById(R.id.textFood);

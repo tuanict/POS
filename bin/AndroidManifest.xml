@@ -38,6 +38,10 @@
             android:name="com.pj3.pos.manager.Payment"
             android:label="@string/title_activity_payment" >
         </activity>
+        <activity
+            android:name="com.pj3.pos.waiter.WaiterMainActivity"
+            android:label="@string/title_activity_waiter" >
+        </activity>
     </application>
 
 </manifest>
