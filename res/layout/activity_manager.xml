@@ -49,7 +49,42 @@
                     android:id="@+id/employee"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" 
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
+                    
+                    <LinearLayout
+                        android:id="@+id/contentEmployee"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content" 
+	                    android:orientation="vertical"
+	                    android:weightSum="2"
+	                    >
+                            <TextView 
+                            android:layout_width="wrap_content"
+	                    	android:layout_height="wrap_content"
+	                    	android:layout_weight="1" 
+                            android:text="Chức vụ:"/>
+                            <Spinner 
+                                android:id="@+id/spPosition"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"/>
+                        	<ImageView 
+                        	    android:id="@+id/addUserAction"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/list_add_user"
+                                android:layout_marginTop="300dp"/>
+                    </LinearLayout>
+                    <GridLayout 
+                        android:id="@+id/gridEmployee"
+	                    android:layout_width="match_parent"
+	                    android:layout_height="match_parent"
+	                    android:columnCount="5"
+					    android:orientation="horizontal"
+					    tools:context=".GridXMLActivity" 
+					    android:background="@drawable/backgroud_e_manager">
+                        
+                    </GridLayout>
                 </LinearLayout>
                 
                  <LinearLayout
