@@ -1,14 +1,18 @@
 package com.pj3.pos.manager;
 
+
+//general dependencies
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+//local dependencies
 import com.pj3.pos.MainActivity;
 import com.pj3.pos.R;
 import com.pj3.pos.res_public.Employee;
-
+import com.pj3.pos.server.*;
+import com.pj3.pos.server.router;
+//android dependencies
 import android.media.Image;
 import android.os.Bundle;
 import android.app.Activity;
@@ -35,6 +39,11 @@ import android.widget.Spinner;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
+//restlet dependencies
+import org.restlet.data.Protocol;
+import org.restlet.routing.Router;
+import org.restlet.routing.VirtualHost;
+import org.restlet.Component;
 
 public class Manager extends Activity implements OnClickListener{
 	TabHost tabHost;
@@ -43,10 +52,12 @@ public class Manager extends Activity implements OnClickListener{
 	GridLayout gridEmployees;
 	PopupWindow popupWindow;
 	Map<LinearLayout, Employee> itemEmployee;
+	DatabaseSource db ;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_manager);
+		dn = new DatabaseSource(this);
 		employees = new ArrayList<Employee>();
 		itemEmployee = new HashMap<LinearLayout, Employee>();
 		loadTab();

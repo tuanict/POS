@@ -16,32 +16,33 @@ import android.content.Context;
 import com.pj3.*;
 import com.pj3.pos.res_public.*;
 import com.pj3.pos.server.sqlite.*;
-
+import com.pj3.pos.manager.Manager;
 import com.pj3.pos.server.sqlite.DatabaseSource;
 
 public class OrderRouter extends ServerResource {
-	DatabaseSource db = new DatabaseSource(null);
+	
 	
 	@Get
 	public Representation doGet (Representation entity) {
-		String tmp = getReference().getRemainingPart();
-		String[] parts = tmp.split("/");
-		String uidString = parts[1];
+		DatabaseSource db = Manager.db;
+		String uidString = getQuery().getValues("q");
+		if(uidString == null ) return new JsonRepresentation("{\"message\":\"error\"}");
+		
 		Order ret = db.getBillTemp(Integer.parseInt(uidString));
 		JSONObject jo1 = new JSONObject();
 		JSONObject jo2 = new JSONObject();
 		try {
 			
-			jo1.put("orderid", ret.getOrderId());
-			jo1.put("tableid", ret.getTableId());
+			jo1.put("o_id", ret.getOrderId());
+			jo1.put("t_id", ret.getTableId());
 			JSONArray foodArray = new JSONArray();
 			for (FoodTemprary t : ret.getFoodTemp()){
-				jo2.put("fid", t.getFoodId());
-				jo2.put("count", t.getCount());
-				jo2.put("note", t.getNote());
+				jo2.put("f_id", t.getFoodId());
+				jo2.put("f_count", t.getCount());
+				jo2.put("f_note", t.getNote());
 				foodArray.put(jo2.toString());
 			}
-			jo1.put("foodarray", jo2);
+			jo1.put("f_array", jo2);
 		} catch(Exception e){
 			e.printStackTrace();
 			return new JsonRepresentation("{\"message\":\"error\"}");
@@ -56,19 +57,19 @@ public class OrderRouter extends ServerResource {
 		try {
 			JsonRepresentation  jsonRep  = new JsonRepresentation(entity);
 			JSONObject 			jsonObj  = jsonRep.getJsonObject();
-			String tableId = jsonObj.getString("tableid");
-			JSONArray foodArray = jsonObj.getJSONArray("foodarray");
+			String tableId = jsonObj.getString("t_id");
+			JSONArray foodArray = jsonObj.getJSONArray("f_array");
 			
 			Order order = new Order();
 			order.setTableId(Integer.parseInt(tableId));
 			
 			for (int i = 0 ; i < foodArray.length(); i ++){
 				FoodTemprary x = new FoodTemprary();
-				String fid = foodArray.getJSONObject(i).getString("fid");
+				String fid = foodArray.getJSONObject(i).getString("f_id");
 				x.setFoodId(Integer.parseInt(fid));
-				String count = foodArray.getJSONObject(i).getString("count");
+				String count = foodArray.getJSONObject(i).getString("f_count");
 				x.setCount(Integer.parseInt(count));
-				String note = foodArray.getJSONObject(i).getString("note");
+				String note = foodArray.getJSONObject(i).getString("f_note");
 				x.setNote(note);			
 			}
 			db.createBillTemp(order);
@@ -84,20 +85,20 @@ public class OrderRouter extends ServerResource {
 	
 	@Put("json")
 	public Representation doPut (Representation entity){
-		String tmp = getReference().getRemainingPart();
-		String[] parts = tmp.split("/");
-		String uidString = parts[1];
+		DatabaseSource db = Manager.db;
+		String uidString = getQuery().getValues("q");
+		if(uidString == null ) return new JsonRepresentation("{\"message\":\"error\"}");
 		Order ret1 = db.getBillTemp(Integer.parseInt(uidString));
 		try {
 			JsonRepresentation  jsonRep  = new JsonRepresentation(entity);
 			JSONObject 			jsonObj  = jsonRep.getJsonObject();
-			JSONArray			ja	     = jsonObj.getJSONArray("foodarray");
+			JSONArray			ja	     = jsonObj.getJSONArray("f_array");
 			for( int i =0; i < ja.length(); i ++){
 				JSONObject jo1 = ja.getJSONObject(i);
 				FoodTemprary ft = new FoodTemprary();
-				ft.setFoodId(Integer.parseInt(jo1.getString("fid")));
-				ft.setCount(Integer.parseInt(jo1.getString("count")));
-				ft.setNote(jo1.getString("note"));
+				ft.setFoodId(Integer.parseInt(jo1.getString("f_id")));
+				ft.setCount(Integer.parseInt(jo1.getString("f_count")));
+				ft.setNote(jo1.getString("f_note"));
 				List<FoodTemprary> listFoodTemp = new ArrayList(ret1.getFoodTemp());
 				listFoodTemp.add(ft);
 				ret1.setFoodTemp(listFoodTemp);

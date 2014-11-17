@@ -13,22 +13,24 @@ import android.content.Context;
 import com.pj3.*;
 import com.pj3.pos.res_public.*;
 import com.pj3.pos.server.sqlite.*;
+import com.pj3.pos.manager.Manager;
+
 public class MenuRouter extends ServerResource {
-	DatabaseSource db = new DatabaseSource(null);
+	
 	@Get
 	public Representation doGet (Representation entity){
-		String tmp = getReference().getRemainingPart();
-		String[] parts = tmp.split("/");
-		String uidString = parts[1];
+		DatabaseSource db = Manager.db;
+		String uidString = getQuery().getValues("q");
+		if(uidString == null ) return new JsonRepresentation("{\"message\":\"error\"}");
 		
 		Food ret  = db.getFood(Integer.parseInt(uidString));
 		JSONObject jo = new JSONObject();
 		try{	
 			jo.put("food_id", ret.getM_food_id());
-			jo.put("foodname", ret.getM_name());
-			jo.put("price", ret.getM_price());
-			jo.put("image", ret.getM_price());
-			jo.put("status", ret.getM_status());
+			jo.put("food_name", ret.getM_name());
+			jo.put("food_price", ret.getM_price());
+			jo.put("food_image", ret.getM_price());
+			jo.put("food_status", ret.getM_status());
 		} catch(Exception e){
 			e.printStackTrace();
 			return new JsonRepresentation("{\"message\":\"error\"}");
@@ -38,17 +40,19 @@ public class MenuRouter extends ServerResource {
 	
 	@Post("json")
 	public Representation doPost (Representation entity){
+		DatabaseSource db = Manager.db;
 		String foodname = "";
 		String price  	= "";
 		String image	= "";
 		String status	= "";
+		
 		try{
 		JsonRepresentation  jsonRep  = new JsonRepresentation(entity);
 		JSONObject 			jsonObj  = jsonRep.getJsonObject();
-		foodname  	= jsonObj.getString("foodname");
-		price 		= jsonObj.getString("price");
+		foodname  	= jsonObj.getString("food_name");
+		price 		= jsonObj.getString("food_price");
 		//image 		= jsonObj.getString("image");
-		status  	= jsonObj.getString("status");
+		status  	= jsonObj.getString("food_status");
 		db.createFood(new Food(foodname,Integer.parseInt(price),image,Boolean.parseBoolean(status)));
 		} catch(Exception e){
 			e.printStackTrace();
@@ -59,35 +63,35 @@ public class MenuRouter extends ServerResource {
 	
 	@Put("json")
 	public Representation doPut (Representation entity){
+		DatabaseSource db = Manager.db;
 		String foodname = "";
 		String price  	= "";
 		String image	= "";
 		String status	= "";
 		String id		= "";
 		
-		String tmp = getReference().getRemainingPart();
-		String[] parts = tmp.split("/");
-		String uidString = parts[1];
+		String uidString = getQuery().getValues("q");
+		if(uidString == null ) return new JsonRepresentation("{\"message\":\"error\"}");
 		try{
-		JsonRepresentation  jsonRep  = new JsonRepresentation(entity);
-		JSONObject 			jsonObj  = jsonRep.getJsonObject();
-		foodname  	= jsonObj.getString("foodname");
-		price 		= jsonObj.getString("price");
-		//image 		= jsonObj.getString("image");
-		status  	= jsonObj.getString("status");
-		db.updateMenu(new Food(Integer.parseInt(uidString),foodname,Integer.parseInt(price),image,Boolean.parseBoolean(status)));
+			JsonRepresentation  jsonRep  = new JsonRepresentation(entity);
+			JSONObject 			jsonObj  = jsonRep.getJsonObject();
+			foodname  	= jsonObj.getString("food_name");
+			price 		= jsonObj.getString("food_price");
+			//image 		= jsonObj.getString("image");
+			status  	= jsonObj.getString("food_status");
+			db.updateMenu(new Food(Integer.parseInt(uidString),foodname,Integer.parseInt(price),image,Boolean.parseBoolean(status)));
 		} catch(Exception e){
 			e.printStackTrace();
 			return new JsonRepresentation("{\"message\":\"error\"}");
 		}
 		return new JsonRepresentation("{\"message\":\"done\"}");
 	}
+	
 	@Delete
 	public Representation doDelete(Representation entity){
-		String tmp = getReference().getRemainingPart();
-		String[] parts = tmp.split("/");
-		String uidString = parts[1];
-		
+		String uidString = getQuery().getValues("q");
+		if(uidString == null ) return new JsonRepresentation("{\"message\":\"error\"}");
+		DatabaseSource db = Manager.db;
 		db.changeStatusFood(Integer.parseInt(uidString), false);
 		return new JsonRepresentation("{\"message\":\"done\"}");
 	}

@@ -14,16 +14,14 @@ import java.util.*;
 import com.pj3.*;
 import com.pj3.pos.res_public.*;
 import com.pj3.pos.server.sqlite.*;
+import com.pj3.pos.manager.Manager;
 
 public class FoodStatusRouter extends ServerResource {
-	DatabaseSource db = new DatabaseSource(null);
 	
 	@Get
 	public Representation doGet (Representation entity){
-		String tmp = getReference().getRemainingPart();
-		String[] parts = tmp.split("/");
-		String uidString = parts[1];
-		if(uidString == null) return null;
+		DatabaseSource db = Manager.db;
+		String uidString = getQuery().getValues("q");
 		JSONObject jo1 = new JSONObject();
 		JSONArray ja1 = new JSONArray();
 		
@@ -38,15 +36,15 @@ public class FoodStatusRouter extends ServerResource {
 					if((q.getStatus() == FoodTemprary.FOOD_STATUS_WAIT && uidString.equalsIgnoreCase("cook")) ||
 						(q.getStatus() == FoodTemprary.FOOD_STATUS_WAIT && uidString.equalsIgnoreCase("waiter"))	){
 						JSONObject jo2 = new JSONObject();
-						jo2.put("fid", Integer.toString(q.getFoodId()));
-						jo2.put("fcount", Integer.toString(q.getCount()));
-						jo2.put("note", q.getNote());						
+						jo2.put("f_id", Integer.toString(q.getFoodId()));
+						jo2.put("f_count", Integer.toString(q.getCount()));
+						jo2.put("f_note", q.getNote());						
 						ja1.put(jo2);
 					}
 					
 				}
 			} 
-			jo1.put("array", ja1);
+			jo1.put("f_array", ja1);
 		}catch(JSONException e){
 				e.printStackTrace();
 				return new JsonRepresentation("{\"message\":\"error\"}");
@@ -63,11 +61,12 @@ public class FoodStatusRouter extends ServerResource {
 		int orderId=0;
 		int fid = 0;
 		int status =0;
+		DatabaseSource db = Manager.db;
 		try{
 			JsonRepresentation  jsonRep  = new JsonRepresentation(entity);
 			JSONObject 			jsonObj  = jsonRep.getJsonObject();
-			orderId = Integer.parseInt(jsonObj.getString("orderid"));
-			fid = Integer.parseInt(jsonObj.getString("fid"));
+			orderId = Integer.parseInt(jsonObj.getString("o_id"));
+			fid = Integer.parseInt(jsonObj.getString("f_id"));
 			status = Integer.parseInt(jsonObj.getString("status"));
 			Order order = db.getBillTemp(orderId);
 			List<FoodTemprary> foodList = order.getFoodTemp();

@@ -12,22 +12,22 @@ import android.content.Context;
 import com.pj3.*;
 import com.pj3.pos.res_public.*;
 import com.pj3.pos.server.sqlite.*;
-
+import com.pj3.pos.manager.Manager;
 //handle user router
 public class UserRouter extends ServerResource {
 	//?
-	DatabaseSource db = new DatabaseSource(null);
+	
 	@Get
 	public Representation doGet (Representation entity) throws Exception{
-		String tmp = getReference().getRemainingPart();
-		String[] parts = tmp.split("/");
-		String uidString = parts[1];
+		DatabaseSource db = Manager.db;
+		String uidString = getQuery().getValues("q");
+		if(uidString == null ) return new JsonRepresentation("{\"message\":\"error\"}");
 		Employee emp = db.getUser(Integer.parseInt(uidString));
 		JSONObject ret  = new JSONObject();
 		ret.put("e_id", emp.getE_id());
 		ret.put("e_name", emp.getE_name());
 		ret.put("e_email", emp.getE_image());
-		ret.put("e_phone_number",emp.getE_phone_number());
+		ret.put("e_phone",emp.getE_phone_number());
 		ret.put("e_position",emp.getPOSITION_p_id());
 		
 		return new JsonRepresentation(ret);
@@ -36,13 +36,14 @@ public class UserRouter extends ServerResource {
 	//create new user
 	@Post("json")
 	public Representation doPost (Representation entity)  {
+		DatabaseSource db = Manager.db;
 		try {
 			JsonRepresentation  jsonRep  = new JsonRepresentation(entity);
 			JSONObject 			jsonObj  = jsonRep.getJsonObject();
 			String username = jsonObj.getString("e_name");
 			String email	= jsonObj.getString("e_email");
 			String password	= jsonObj.getString("e_password");
-			String phone_num = jsonObj.getString("e_phone_number");
+			String phone_num = jsonObj.getString("e_phone");
 			String position	= jsonObj.getString("e_position");
 			db.createUser(new Employee(username,email,password,"",Integer.parseInt(phone_num),Integer.parseInt(position)));
 			return new JsonRepresentation("{\"message\":\"done\"}");
@@ -55,9 +56,9 @@ public class UserRouter extends ServerResource {
 	//edit user info
 	@Put("json")
 	public Representation doPut (Representation entity){
-		String tmp = getReference().getRemainingPart();
-		String[] parts = tmp.split("/");
-		String uidString = parts[1];
+		DatabaseSource db = Manager.db;
+		String uidString = getQuery().getValues("q");
+		if(uidString == null ) return new JsonRepresentation("{\"message\":\"error\"}");
 		
 		try {
 			JsonRepresentation  jsonRep  = new JsonRepresentation(entity);
@@ -78,9 +79,9 @@ public class UserRouter extends ServerResource {
 	//delete an user
 	@Delete
 	public Representation doDelete(Representation entity){
-		String tmp = getReference().getRemainingPart();
-		String[] parts = tmp.split("/");
-		String uidString = parts[1];
+		DatabaseSource db = Manager.db;
+		String uidString = getQuery().getValues("q");
+		if(uidString == null ) return new JsonRepresentation("{\"message\":\"error\"}");
 		db.deleteUser(Integer.parseInt(uidString));
 		return new JsonRepresentation("{\"message\":\"done\"}");
 	}
