@@ -34,12 +34,13 @@ public final class R {
     }
     public static final class id {
         public static final int TextTable=0x7f090018;
-        public static final int action_settings=0x7f090021;
+        public static final int action_settings=0x7f090025;
         public static final int btAddOrder=0x7f09000c;
         public static final int btHuy=0x7f09000f;
         public static final int btnSendBill=0x7f090017;
         public static final int employee=0x7f090002;
         public static final int expandableListView1=0x7f090006;
+        public static final int imgF=0x7f090021;
         public static final int imgFood=0x7f090019;
         public static final int iv_add=0x7f090020;
         public static final int iv_food_icon=0x7f09001c;
@@ -47,7 +48,10 @@ public final class R {
         public static final int lvOrder=0x7f09000b;
         public static final int lv_order_detail=0x7f09000e;
         public static final int menu=0x7f090001;
+        public static final int nameF=0x7f090022;
         public static final int payment=0x7f090000;
+        public static final int priceF=0x7f090024;
+        public static final int qttyF=0x7f090023;
         public static final int section_label=0x7f090004;
         public static final int spTable1=0x7f09000a;
         public static final int spTable2=0x7f090012;
@@ -63,10 +67,10 @@ public final class R {
         public static final int textQuantity=0x7f09001b;
         public static final int textView=0x7f090009;
         public static final int textViewSum=0x7f090016;
-        public static final int textViewTable=0x7f090011;
-        public static final int textViewTurn=0x7f090013;
         public static final int tv_food_name=0x7f09001d;
         public static final int tv_order_name=0x7f09001f;
+        public static final int txtTable=0x7f090011;
+        public static final int txtTurn=0x7f090013;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -78,6 +82,7 @@ public final class R {
         public static final int waiter_tab1_sub_list_item_food=0x7f030006;
         public static final int waiter_tab2_item_food=0x7f030007;
         public static final int waiter_tab2_item_order=0x7f030008;
+        public static final int waiter_tab3_item_noti=0x7f030009;
     }
     public static final class menu {
         public static final int main=0x7f080000;
