@@ -6,6 +6,7 @@ import java.util.HashMap;
 import com.pj3.pos.R;
 import com.pj3.pos.waiter.SwipeDismissListViewTouchListener;
 
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -24,30 +25,36 @@ import android.widget.TextView;
 
 public class WaiterMainActivity extends Activity {
 
-	public String[] numberOfTable = { "1", "2", "3", "4", "5", "6", "7", "8" }; // receive
+	public String[] arrTable = { "1", "2", "3", "4", "5", "6", "7", "8" }; // receive
 																				// data
 																				// from
 																				// server
+	public ArrayList<String> arrTurn = new ArrayList<String>();
 	public ArrayList<String> listOrderTempt = new ArrayList<String>();
 	private ArrayList<String> listOrderDetailTempt = new ArrayList<String>();
 	
-	public ArrayAdapter<String> aaTable;
+	public ArrayAdapter<String> aaTable, aaTurn;
 	public OrderAdapter aaOrder;
 	private FoodAdapter aaFood;
 	
-	public Spinner spTable;
-	public ListView lvOrder, lv_order_detail;
+	public Spinner spTable, tab3spTable, tab3spTurn ;
+	public ListView lvOrder, lv_order_detail, tab3_list;
 	private LinearLayout tab2_order, tab2_order_detail;
-	ArrayList<HashMap<String, Object>> groupList = new ArrayList<HashMap<String,Object>>();
-	ArrayList<ArrayList<HashMap<String, Object>>> childList; 
-	Tab1Adapter exmylist;
+	private ArrayList<HashMap<String, Object>> groupList = new ArrayList<HashMap<String,Object>>();
+	private ArrayList<ArrayList<HashMap<String, Object>>> childList; 
+	public Tab1Adapter tab1list;
+	
+	private ArrayList<HashMap<String, Object>> tab3ListItem = new ArrayList<HashMap<String,Object>>();
+	public Tab3Adapter tab3Adapter;
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.waiter_main);
+        setContentView(R.layout.waiter_main);
         loadTab();
         tab2();
 		tab1();
+		tab3();
     }
     
     public void tab1(){
@@ -79,7 +86,7 @@ public class WaiterMainActivity extends Activity {
 
         childList.add(a2);
         ExpandableListView subList = (ExpandableListView) findViewById(R.id.expandableListView1);
-        exmylist = new Tab1Adapter(getApplicationContext(), groupList, childList);
+        tab1list = new Tab1Adapter(getApplicationContext(), groupList, childList);
         
         SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(subList, 
         		new SwipeDismissListViewTouchListener.DismissCallbacks() {
@@ -117,14 +124,14 @@ public class WaiterMainActivity extends Activity {
         subList.setOnTouchListener(touchListener);       
         subList.setOnScrollListener(touchListener.makeScrollListener());
         
-        subList.setAdapter(exmylist) ;
-        exmylist.notifyDataSetChanged() ;
+        subList.setAdapter(tab1list) ;
+        tab1list.notifyDataSetChanged() ;
     }
     
     public void tab2() {
 		spTable = (Spinner) findViewById(R.id.spTable1);
 		aaTable = new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1, numberOfTable);
+				android.R.layout.simple_list_item_1, arrTable);
 		spTable.setAdapter(aaTable);
 
 		lvOrder = (ListView) findViewById(R.id.lvOrder);
@@ -147,6 +154,40 @@ public class WaiterMainActivity extends Activity {
 				listOrderDetailTempt);
 		lv_order_detail.setAdapter(aaFood);
 	}
+    
+    public void tab3(){
+    	tab3spTable = (Spinner) findViewById(R.id.spTable2);
+    	aaTable = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrTable);
+    	tab3spTable.setAdapter(aaTable);
+    	
+    	arrTurn.add("1");
+    	arrTurn.add("2");
+    	arrTurn.add("3");
+    	arrTurn.add("4");
+    	arrTurn.add("5");
+    	
+    	tab3spTurn = (Spinner) findViewById(R.id.spTurn);
+    	aaTurn = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrTurn);
+    	tab3spTurn.setAdapter(aaTurn);
+    	
+    	HashMap<String, Object> a1 = new HashMap<String, Object>();
+        a1.put("imgF", R.drawable.coffeeicon);
+        a1.put("nameF", "Cafe");
+        a1.put("qttyF", "x1");
+        a1.put("priceF", "20k/coc");
+        
+        tab3ListItem.add(a1);
+        tab3ListItem.add(a1);
+        tab3ListItem.add(a1);
+        tab3ListItem.add(a1);
+        
+    	tab3_list = (ListView) findViewById(R.id.listDish);
+    	tab3Adapter = new Tab3Adapter(this, R.layout.waiter_tab3_item_noti, tab3ListItem);
+    	tab3_list.setAdapter(tab3Adapter);
+    	tab3Adapter.notifyDataSetChanged();
+    	
+    	
+    }
 
 	public void loadTab() {
 		final TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);

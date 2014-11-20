@@ -26,21 +26,13 @@
             -->
         </activity>
         <activity
-            android:name="com.pj3.pos.manager.Manager"
-            android:label="@string/title_activity_manager" >
+            android:name="com.pj3.pos.waiter.WaiterMainActivity"
+            android:label="@string/title_activity_waiter" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name="com.pj3.pos.manager.Payment"
-            android:label="@string/title_activity_payment" >
-        </activity>
-        <activity
-            android:name="com.pj3.pos.waiter.WaiterMainActivity"
-            android:label="@string/title_activity_waiter" >
         </activity>
     </application>
 

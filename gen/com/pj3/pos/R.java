@@ -38,7 +38,7 @@ public final class R {
     }
     public static final class id {
         public static final int TextTable=0x7f090029;
-        public static final int action_settings=0x7f090032;
+        public static final int action_settings=0x7f090036;
         public static final int addUserAction=0x7f090001;
         public static final int btAddOrder=0x7f09001d;
         public static final int btHuy=0x7f090020;
@@ -54,6 +54,7 @@ public final class R {
         public static final int employee=0x7f090006;
         public static final int expandableListView1=0x7f090017;
         public static final int gridEmployee=0x7f090009;
+        public static final int imgF=0x7f090032;
         public static final int imgFood=0x7f09002a;
         public static final int iv_add=0x7f090031;
         public static final int iv_food_icon=0x7f09002d;
@@ -62,14 +63,17 @@ public final class R {
         public static final int lvOrder=0x7f09001c;
         public static final int lv_order_detail=0x7f09001f;
         public static final int m_e_cancel_button=0x7f090014;
-        public static final int m_e_delete=0x7f090035;
+        public static final int m_e_delete=0x7f090039;
         public static final int m_e_done_button=0x7f090013;
-        public static final int m_e_edit=0x7f090034;
-        public static final int m_e_view=0x7f090033;
+        public static final int m_e_edit=0x7f090038;
+        public static final int m_e_view=0x7f090037;
         public static final int menu=0x7f090005;
+        public static final int nameF=0x7f090033;
         public static final int passLogin=0x7f090003;
         public static final int payment=0x7f090004;
         public static final int picture_profile=0x7f090012;
+        public static final int priceF=0x7f090035;
+        public static final int qttyF=0x7f090034;
         public static final int section_label=0x7f090015;
         public static final int spPosition=0x7f090008;
         public static final int spTable1=0x7f09001b;
@@ -86,10 +90,10 @@ public final class R {
         public static final int textQuantity=0x7f09002c;
         public static final int textView=0x7f09001a;
         public static final int textViewSum=0x7f090027;
-        public static final int textViewTable=0x7f090022;
-        public static final int textViewTurn=0x7f090024;
         public static final int tv_food_name=0x7f09002e;
         public static final int tv_order_name=0x7f090030;
+        public static final int txtTable=0x7f090022;
+        public static final int txtTurn=0x7f090024;
         public static final int usernameLogin=0x7f090002;
     }
     public static final class layout {
@@ -107,6 +111,7 @@ public final class R {
         public static final int waiter_tab1_sub_list_item_food=0x7f03000b;
         public static final int waiter_tab2_item_food=0x7f03000c;
         public static final int waiter_tab2_item_order=0x7f03000d;
+        public static final int waiter_tab3_item_noti=0x7f03000e;
     }
     public static final class menu {
         public static final int dialog_info_employee=0x7f080000;
