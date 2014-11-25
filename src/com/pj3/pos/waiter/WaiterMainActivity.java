@@ -9,10 +9,12 @@ import com.pj3.pos.waiter.SwipeDismissListViewTouchListener;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
@@ -43,6 +45,7 @@ public class WaiterMainActivity extends Activity {
 	private ArrayList<HashMap<String, Object>> groupList = new ArrayList<HashMap<String,Object>>();
 	private ArrayList<ArrayList<HashMap<String, Object>>> childList; 
 	public Tab1Adapter tab1list;
+	int x;
 	
 	private ArrayList<HashMap<String, Object>> tab3ListItem = new ArrayList<HashMap<String,Object>>();
 	public Tab3Adapter tab3Adapter;
@@ -95,22 +98,25 @@ public class WaiterMainActivity extends Activity {
 					public void onDismiss(ListView subList, int[] reverseSortedPositions) {
 						// TODO Auto-generated method stub
 						for (int position : reverseSortedPositions) {
-							for(int i = 0; i < groupList.size(); i++) {
-					        	position -= 1;
-					        	if (position < 0) {
-					        		// idGroup = i ; cái này là ch�?n group
-					        		return;
-					        	}
-					        	
-					        	if(((ExpandableListView) subList).isGroupExpanded(i)) {
-					        		if (position < childList.get(i).size()) {
-					        			// idGroup = i; idChild = position; ; cái này là ch�?n 1 child
-					        		} else {
-					        			position -= childList.get(i).size() ;
-					        		
-					        		}
-					        	}
-					        }
+							
+							AlphaAnimation animation = new AlphaAnimation(0.3f, 0.2f);                                    	    
+		                    animation.setDuration(9000);
+		                    animation.setFillAfter(false);                                	
+		                    x = (int)position;
+		                    //listView.getChildAt(position).startAnimation(animation);  //gan animation   
+		                    (ExpandableListView)subList.getChildAt(position).is
+		                   	boolean lammo = true;
+		                    Handler mHandler = new Handler();
+		                    Runnable _run = new Runnable() {
+		                    	@Override
+								public void run() {
+									subList.getChildAt(position).is
+		                            
+		                            taomoi_scroll = true;
+		                            lammo = false;
+								}
+		                    };
+		                    mHandler.postDelayed(_run, 9000);
 						}
 						
 					}
