@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
@@ -44,11 +45,13 @@ public class WaiterMainActivity extends Activity {
 	private LinearLayout tab2_order, tab2_order_detail;
 	private ArrayList<HashMap<String, Object>> groupList = new ArrayList<HashMap<String,Object>>();
 	private ArrayList<ArrayList<HashMap<String, Object>>> childList; 
-	public Tab1Adapter tab1list;
-	int x;
+	public Tab1Adapter tab1adpt;
 	
 	private ArrayList<HashMap<String, Object>> tab3ListItem = new ArrayList<HashMap<String,Object>>();
 	public Tab3Adapter tab3Adapter;
+	
+	boolean  makeblur = false;
+	boolean taomoi_scroll = false; 
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +92,7 @@ public class WaiterMainActivity extends Activity {
 
         childList.add(a2);
         ExpandableListView subList = (ExpandableListView) findViewById(R.id.expandableListView1);
-        tab1list = new Tab1Adapter(getApplicationContext(), groupList, childList);
+        tab1adpt= new Tab1Adapter(getApplicationContext(), groupList, childList);
         
         SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(subList, 
         		new SwipeDismissListViewTouchListener.DismissCallbacks() {
@@ -97,23 +100,24 @@ public class WaiterMainActivity extends Activity {
 					@Override
 					public void onDismiss(ListView subList, int[] reverseSortedPositions) {
 						// TODO Auto-generated method stub
-						for (int position : reverseSortedPositions) {
+						for (final int position : reverseSortedPositions) {
 							
 							AlphaAnimation animation = new AlphaAnimation(0.3f, 0.2f);                                    	    
 		                    animation.setDuration(9000);
-		                    animation.setFillAfter(false);                                	
-		                    x = (int)position;
-		                    //listView.getChildAt(position).startAnimation(animation);  //gan animation   
-		                    (ExpandableListView)subList.getChildAt(position).is
-		                   	boolean lammo = true;
+		                    animation.setFillAfter(false);                              
+		                     
+		                    subList.getChildAt(position).startAnimation(animation);
+		                   	makeblur = true;
 		                    Handler mHandler = new Handler();
 		                    Runnable _run = new Runnable() {
 		                    	@Override
 								public void run() {
-									subList.getChildAt(position).is
-		                            
+		                    		if(position != AbsListView.INVALID_POSITION){
+		                    			childList.remove(position);
+		                    		}
+		                    		else groupList.remove(position);
 		                            taomoi_scroll = true;
-		                            lammo = false;
+		                            makeblur = false;
 								}
 		                    };
 		                    mHandler.postDelayed(_run, 9000);
@@ -130,8 +134,8 @@ public class WaiterMainActivity extends Activity {
         subList.setOnTouchListener(touchListener);       
         subList.setOnScrollListener(touchListener.makeScrollListener());
         
-        subList.setAdapter(tab1list) ;
-        tab1list.notifyDataSetChanged() ;
+        subList.setAdapter(tab1adpt) ;
+        tab1adpt.notifyDataSetChanged() ;
     }
     
     public void tab2() {
