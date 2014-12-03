@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#9ac0fa"
+    android:orientation="vertical"
+    android:weightSum="5" >
+
+    <ImageView
+        android:layout_marginTop="5dp"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/gridfood_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:src="@drawable/coffeeicon" />
+
+    <TextView
+        android:gravity="center"
+        android:id="@+id/gridfood_tv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="4"
+        android:text="FoodName"
+        android:textColor="#3c7b2b" >
+    </TextView>
+
+</LinearLayout>
