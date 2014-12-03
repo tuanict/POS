@@ -1,22 +1,36 @@
 package com.pj3.pos.waiter;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.pj3.pos.R;
-import com.pj3.pos.waiter.SwipeDismissListViewTouchListener;
-
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
-import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,179 +39,200 @@ import android.widget.Spinner;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import com.pj3.pos.R;
+import com.pj3.pos.res_public.FoodStatistic;
 
 public class WaiterMainActivity extends Activity {
-
-	public String[] arrTable = { "1", "2", "3", "4", "5", "6", "7", "8" }; // receive
-																				// data
-																				// from
-																				// server
+	// receive data from server
+	public ArrayList<String> arrTable = new ArrayList<String>();
 	public ArrayList<String> arrTurn = new ArrayList<String>();
-	public ArrayList<String> listOrderTempt = new ArrayList<String>();
-	private ArrayList<String> listOrderDetailTempt = new ArrayList<String>();
-	
+	public ArrayList<String> listOrder = new ArrayList<String>();
+
+	// du lieu mon an cua 1 order
+	public ArrayList<FoodStatistic> listOrderDetail;
+	public ArrayList<FoodStatistic> hehe = new ArrayList<FoodStatistic>();
+
 	public ArrayAdapter<String> aaTable, aaTurn;
 	public OrderAdapter aaOrder;
 	private FoodAdapter aaFood;
-	
-	public Spinner spTable, tab3spTable, tab3spTurn ;
+
+	public Spinner spTable, tab3spTable, tab3spTurn;
 	public ListView lvOrder, lv_order_detail, tab3_list;
 	private LinearLayout tab2_order, tab2_order_detail;
-	private ArrayList<HashMap<String, Object>> groupList = new ArrayList<HashMap<String,Object>>();
-	private ArrayList<ArrayList<HashMap<String, Object>>> childList; 
+	private ArrayList<HashMap<String, Object>> groupList = new ArrayList<HashMap<String, Object>>();
+	private ArrayList<ArrayList<HashMap<String, Object>>> childList = new ArrayList<ArrayList<HashMap<String, Object>>>();
 	public Tab1Adapter tab1adpt;
-	
-	private ArrayList<HashMap<String, Object>> tab3ListItem = new ArrayList<HashMap<String,Object>>();
-	public Tab3Adapter tab3Adapter;
-	
-	boolean  makeblur = false;
-	boolean taomoi_scroll = false; 
-	
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.waiter_main);
-        loadTab();
-        tab2();
-		tab1();
-		tab3();
-    }
-    
-    public void tab1(){
-        childList = new ArrayList<ArrayList<HashMap<String,Object>>>();
-        
-        HashMap<String, Object> h1 = new HashMap<String, Object>();
-        h1.put("txtTable", "ban 1");
-        //h1.put("chkTable", true);
-        HashMap<String, Object> h2 = new HashMap<String, Object>();
-        h2.put("txtTable", "ban 2");
-        //h2.put("chkTable", true);
-        groupList.add(h1);
-        groupList.add(h2);
-        
-        HashMap<String, Object> s1 = new HashMap<String, Object>();
-        s1.put("imgFood", R.drawable.coffeeicon);
-        s1.put("txtFood", "Cafe");
-        s1.put("txtQuantity", "x1");
-        s1.put("idFood", 1);
-        
-        ArrayList<HashMap<String, Object>> a1 = new ArrayList<HashMap<String,Object>>();
-        a1.add(s1);
-        
-        childList.add(a1);
-        
-        ArrayList<HashMap<String, Object>> a2 = new ArrayList<HashMap<String,Object>>();
-        a2.add(s1);
-        
 
-        childList.add(a2);
-        ExpandableListView subList = (ExpandableListView) findViewById(R.id.expandableListView1);
-        tab1adpt= new Tab1Adapter(getApplicationContext(), groupList, childList);
-        
-        SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(subList, 
-        		new SwipeDismissListViewTouchListener.DismissCallbacks() {
-					
-					@Override
-					public void onDismiss(ListView subList, int[] reverseSortedPositions) {
-						// TODO Auto-generated method stub
-						for (final int position : reverseSortedPositions) {
-							
-							AlphaAnimation animation = new AlphaAnimation(0.3f, 0.2f);                                    	    
-		                    animation.setDuration(9000);
-		                    animation.setFillAfter(false);                              
-		                     
-		                    subList.getChildAt(position).startAnimation(animation);
-		                   	makeblur = true;
-		                    Handler mHandler = new Handler();
-		                    Runnable _run = new Runnable() {
-		                    	@Override
-								public void run() {
-		                    		if(position != AbsListView.INVALID_POSITION){
-		                    			childList.remove(position);
-		                    		}
-		                    		else groupList.remove(position);
-		                            taomoi_scroll = true;
-		                            makeblur = false;
-								}
-		                    };
-		                    mHandler.postDelayed(_run, 9000);
-						}
-						
-					}
-					
-					@Override
-					public boolean canDismiss(int position) {
-						// TODO Auto-generated method stub
-						return true;
-					}
-				});
-        subList.setOnTouchListener(touchListener);       
-        subList.setOnScrollListener(touchListener.makeScrollListener());
-        
-        subList.setAdapter(tab1adpt) ;
-        tab1adpt.notifyDataSetChanged() ;
-    }
-    
-    public void tab2() {
+	private ArrayList<HashMap<String, Object>> tab3ListItem = new ArrayList<HashMap<String, Object>>();
+	public Tab3Adapter tab3Adapter;
+
+	boolean makeblur = false;
+	boolean taomoi_scroll = false;
+
+	// bien chon ban cho order
+	private int idBanOrder;
+	Button btThemMon, btHoanThanh;
+
+	// tab3 cua Thang
+	// public Tab3Adapter tab3Adapter;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.waiter_main);
+		loadTab();
+		tab2();
+		tab1();
+		// tab3();
+	}
+
+	public void tab1() {
+		if (isConnected()) {
+			new HttpAsyncTask().execute("order.json");
+
+		} else {
+
+		}
+	}
+
+	public boolean isConnected() {
+		ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+		if (networkInfo != null && networkInfo.isConnected())
+			return true;
+		else
+			return false;
+	}
+
+	public void tab2() {
+	
+		btThemMon = (Button) findViewById(R.id.btThemMon);
+		btThemMon.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent itGridFood = new Intent(WaiterMainActivity.this,
+						WaiterOrderGridfood.class);
+				startActivityForResult(itGridFood, 111);
+			}
+		});
+		btHoanThanh = (Button) findViewById(R.id.btHoanThanh);
+		btHoanThanh.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				tab2_order.setVisibility(View.VISIBLE);
+				tab2_order_detail.setVisibility(View.GONE);
+			}
+		});
+
+		listOrderDetail = new ArrayList<FoodStatistic>();
 		spTable = (Spinner) findViewById(R.id.spTable1);
+		spTable.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> arg0, View arg1,
+					int position, long arg3) {
+				idBanOrder = position + 1;
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+		});
+		// 20 ban
+		for (int i = 1; i < 21; i++) {
+			arrTable.add(i + "");
+		}
 		aaTable = new ArrayAdapter<String>(this,
 				android.R.layout.simple_list_item_1, arrTable);
 		spTable.setAdapter(aaTable);
-
 		lvOrder = (ListView) findViewById(R.id.lvOrder);
-		listOrderTempt.add("Lượt 1");
-		listOrderTempt.add("Lượt 2");
 		aaOrder = new OrderAdapter(this, R.layout.waiter_tab2_item_order,
-				listOrderTempt);
+				listOrder);
+		lvOrder.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1,
+					int position, long arg3) {
+				// Intent itGridFood = new Intent(
+				// "android.intent.action.WAITERORDERGRIDFOOD");
+				Intent itGridFood = new Intent(WaiterMainActivity.this,
+						WaiterOrderGridfood.class);
+				startActivityForResult(itGridFood, 111);
+			}
+		});
 		lvOrder.setAdapter(aaOrder);
 
-		tab2_order = (LinearLayout) findViewById(R.id.tab2_order);
-
-		tab2_order_detail = (LinearLayout) findViewById(R.id.tab2_order_detail);
+		tab2_order = (LinearLayout) findViewById(R.id.waiter_tab2_main);
+		tab2_order_detail = (LinearLayout) findViewById(R.id.tab2_orderdetail);
 		tab2_order_detail.setVisibility(View.GONE);
+
 		lv_order_detail = (ListView) findViewById(R.id.lv_order_detail);
-		listOrderDetailTempt.add("Cafe đen");
-		listOrderDetailTempt.add("Chanh leo");
-		listOrderDetailTempt.add("Cafe nâu");
-		listOrderDetailTempt.add("Mojito");
-		aaFood = new FoodAdapter(this, R.layout.waiter_tab2_item_food,
-				listOrderDetailTempt);
+		// FoodStatistic fs1 = new FoodStatistic();
+		// fs1.setF_b_id(1);
+		// fs1.setM_name("Táo");
+		// hehe.add(fs1);
+		// listOrderDetail.add(fs1);
+		aaFood = new FoodAdapter(WaiterMainActivity.this,
+				R.layout.waiter_tab2_item_food, listOrderDetail);
 		lv_order_detail.setAdapter(aaFood);
 	}
-    
-    public void tab3(){
-    	tab3spTable = (Spinner) findViewById(R.id.spTable2);
-    	aaTable = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrTable);
-    	tab3spTable.setAdapter(aaTable);
-    	
-    	arrTurn.add("1");
-    	arrTurn.add("2");
-    	arrTurn.add("3");
-    	arrTurn.add("4");
-    	arrTurn.add("5");
-    	
-    	tab3spTurn = (Spinner) findViewById(R.id.spTurn);
-    	aaTurn = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrTurn);
-    	tab3spTurn.setAdapter(aaTurn);
-    	
-    	HashMap<String, Object> a1 = new HashMap<String, Object>();
-        a1.put("imgF", R.drawable.coffeeicon);
-        a1.put("nameF", "Cafe");
-        a1.put("qttyF", "x1");
-        a1.put("priceF", "20k/coc");
-        
-        tab3ListItem.add(a1);
-        tab3ListItem.add(a1);
-        tab3ListItem.add(a1);
-        tab3ListItem.add(a1);
-        
-    	tab3_list = (ListView) findViewById(R.id.listDish);
-    	tab3Adapter = new Tab3Adapter(this, R.layout.waiter_tab3_item_noti, tab3ListItem);
-    	tab3_list.setAdapter(tab3Adapter);
-    	tab3Adapter.notifyDataSetChanged();
-    	
-    	
-    }
+	
+	// nhan du lieu tu viec chon mon
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == 111 && resultCode == 1111) {
+			Bundle b = data.getBundleExtra("b");
+			FoodStatistic fs = null;
+			fs = (FoodStatistic) b.getSerializable("fs");
+			// Log.d("hehe",fs.getM_option()+"");
+			listOrderDetail.add(fs);
+			aaFood.notifyDataSetChanged();
+			tab2_order.setVisibility(View.GONE);
+			tab2_order_detail.setVisibility(View.VISIBLE);
+		}
+	}
+
+	public void tab3() {
+		tab3spTable = (Spinner) findViewById(R.id.spTable2);
+		aaTable = new ArrayAdapter<String>(this,
+				android.R.layout.simple_list_item_1, arrTable);
+		tab3spTable.setAdapter(aaTable);
+
+		arrTurn.add("1");
+		arrTurn.add("2");
+		arrTurn.add("3");
+		arrTurn.add("4");
+		arrTurn.add("5");
+
+		tab3spTurn = (Spinner) findViewById(R.id.spTurn);
+		aaTurn = new ArrayAdapter<String>(this,
+				android.R.layout.simple_list_item_1, arrTurn);
+		tab3spTurn.setAdapter(aaTurn);
+
+		HashMap<String, Object> a1 = new HashMap<String, Object>();
+		a1.put("imgF", R.drawable.coffeeicon);
+		a1.put("nameF", "Cafe");
+		a1.put("qttyF", "x1");
+		a1.put("priceF", "20k/coc");
+
+		tab3ListItem.add(a1);
+		tab3ListItem.add(a1);
+		tab3ListItem.add(a1);
+		tab3ListItem.add(a1);
+
+		tab3_list = (ListView) findViewById(R.id.listDish);
+		// tab3 cua Thang
+		// tab3Adapter = new Tab3Adapter(this, R.layout.waiter_tab3_item_noti,
+		// tab3ListItem);
+		// tab3_list.setAdapter(tab3Adapter);
+		// tab3Adapter.notifyDataSetChanged();
+
+	}
 
 	public void loadTab() {
 		final TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
@@ -206,7 +241,7 @@ public class WaiterMainActivity extends Activity {
 		TabHost.TabSpec spec;
 		spec = tabhost.newTabSpec("spec1");
 		spec.setContent(R.id.tab1);
-		spec.setIndicator("",this.getResources().getDrawable(R.drawable.tab1));
+		spec.setIndicator("", this.getResources().getDrawable(R.drawable.tab1));
 		tabhost.addTab(spec);
 
 		spec = tabhost.newTabSpec("spec2");
@@ -223,9 +258,12 @@ public class WaiterMainActivity extends Activity {
 	}
 
 	// event click button ThemMoi
-	public void click_themmoi(View v) {
-		tab2_order.setVisibility(View.GONE);
-		tab2_order_detail.setVisibility(View.VISIBLE);
+	public void click_AddOrder(View v) {
+		// Toast.makeText(getBaseContext(), "hehe", Toast.LENGTH_LONG).show();
+		// Tam thoi the nay da, chua xu ly duoc luot
+		listOrder.add("Bàn " + idBanOrder + " Lượt n");
+		aaOrder.notifyDataSetChanged();
+
 	}
 
 	static class OrderHolder {
@@ -275,44 +313,43 @@ public class WaiterMainActivity extends Activity {
 	static class FoodHolder {
 		ImageView ivFoodIcon;
 		TextView tvFoodName;
-		Spinner spFoodNumber;
+		TextView tvFoodNumber;
+		TextView tvFoodOptionChecked;
 
 		public FoodHolder(View row) {
 			ivFoodIcon = (ImageView) row.findViewById(R.id.iv_food_icon);
 			tvFoodName = (TextView) row.findViewById(R.id.tv_food_name);
-			spFoodNumber = (Spinner) row.findViewById(R.id.sp_food_number);
+			tvFoodNumber = (TextView) row.findViewById(R.id.tv_food_number);
+			tvFoodOptionChecked = (TextView) row
+					.findViewById(R.id.tv_food_option_checked);
 		}
 
-		public void populateFrom(String s) {
-			tvFoodName.setText(s);
+		public void populateFrom(FoodStatistic fs) {
+			// Chua xu ly anh
+			tvFoodName.setText(fs.getM_name());
+			tvFoodNumber.setText(fs.getF_count() + "");
+			// options nay chi gom nhung cai da check
+			tvFoodOptionChecked.setText(fs.getM_option() + "");
 		}
 	}
 
 	// for listview order_detail, "String" is temporary input
-	class FoodAdapter extends ArrayAdapter<String> {
+	class FoodAdapter extends ArrayAdapter<FoodStatistic> {
 		Activity context;
 		int idLayout;
-		ArrayList<String> data;
+		// La FoodStatistic vi can su dung ten mon an
+		ArrayList<FoodStatistic> data;
 
-		// private String[] data_spin = { "1", "2", "3", "4", "5", "6", "7",
-		// "8",
-		// "9", "10", "11", "12" };
-		// private ArrayAdapter<String> aa_spin = new ArrayAdapter<String>(
-		// WaiterMainActivity.this, android.R.layout.simple_list_item_1,
-		// data_spin);
-
-		public FoodAdapter(Activity context, int idLayout, ArrayList<String> data) 
-		{
+		public FoodAdapter(Activity context, int idLayout,
+				ArrayList<FoodStatistic> data) {
 			super(context, idLayout, data);
 			this.context = context;
 			this.idLayout = idLayout;
 			this.data = data;
-
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) 
-		{
+		public View getView(int position, View convertView, ViewGroup parent) {
 			View row = convertView;
 			FoodHolder holder;
 			if (row == null) {
@@ -328,27 +365,164 @@ public class WaiterMainActivity extends Activity {
 		}
 	}
 
+	public static String GET(String url) {
+		InputStream inputStream = null;
+		String result = "";
+		try {
 
+			// create HttpClient
+			HttpClient httpclient = new DefaultHttpClient();
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+			// make GET request to the given URL
+			HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    
- 
+			// receive response as inputStream
+			inputStream = httpResponse.getEntity().getContent();
+
+			// convert inputstream to string
+			if (inputStream != null)
+				result = convertInputStreamToString(inputStream);
+			else
+				result = "Did not work!";
+
+		} catch (Exception e) {
+			Log.d("InputStream", e.getLocalizedMessage());
+		}
+
+		return result;
+	}
+
+	private static String convertInputStreamToString(InputStream inputStream)
+			throws IOException {
+		BufferedReader bufferedReader = new BufferedReader(
+				new InputStreamReader(inputStream));
+		String line = "";
+		String result = "";
+		while ((line = bufferedReader.readLine()) != null)
+			result += line;
+
+		inputStream.close();
+		return result;
+
+	}
+
+	private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+
+		@Override
+		protected String doInBackground(String... urls) {
+			// TODO Auto-generated method stub
+			String json = "{\"o_array\":[{\"o_id\":\"1\",\"t_id\":\"1\",\"t_count\":\"1\",\"f_array\":[{\"f_id\":\"1\",\"f_count\":\"3\",\"f_name\":\"cafe\"},{\"f_id\":\"2\",\"f_count\":\"3\",\"f_name\":\"yohurt\"}]},{\"o_id\":\"2\",\"t_id\":\"2\",\"t_count\":\"1\",\"f_array\":[{\"f_id\":\"2\",\"f_count\":\"3\",\"f_name\":\"cafe\"},{\"f_id\":\"004\",\"f_count\":\"3\",\"f_name\":\"yohurt\"}]}]}";
+			parsingJson(json);
+			return GET(urls[0]);
+		}
+
+	}
+
+	public void parsingJson(String result) {
+		try {
+			JSONObject json = new JSONObject(result);
+			JSONArray orderArr = json.getJSONArray("o_array");
+			for (int i = 0; i < orderArr.length(); i++) {
+				HashMap<String, Object> table = new HashMap<String, Object>();
+				table.put("txtTable", "Bàn"
+						+ orderArr.getJSONObject(i).getString("t_id"));
+				table.put("txtTurn", "Lượt"
+						+ orderArr.getJSONObject(i).getString("t_count"));
+				groupList.add(table);
+
+				JSONArray foodArr = orderArr.getJSONObject(i).getJSONArray(
+						"f_array");
+				ArrayList<HashMap<String, Object>> foods_i = new ArrayList<HashMap<String, Object>>();
+				for (int j = 0; j < foodArr.length(); j++) {
+					HashMap<String, Object> food = new HashMap<String, Object>();
+					food.put("imgFood", R.drawable.coffeeicon);
+					food.put("txtFood",
+							foodArr.getJSONObject(j).getString("f_name"));
+					food.put("txtQuantity",
+							foodArr.getJSONObject(j).getString("f_count"));
+					food.put("idFood", j++);
+					foods_i.add(food);
+				}
+				childList.add(foods_i);
+
+			}
+
+			ExpandableListView subList = (ExpandableListView) findViewById(R.id.expandableListView1);
+			tab1adpt = new Tab1Adapter(getApplicationContext(), groupList,
+					childList);
+
+			SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(
+					subList,
+					new SwipeDismissListViewTouchListener.DismissCallbacks() {
+
+						@Override
+						public void onDismiss(ListView subList,
+								int[] reverseSortedPositions) {
+							// TODO Auto-generated method stub
+							for (final int position : reverseSortedPositions) {
+
+								AlphaAnimation animation = new AlphaAnimation(
+										0.3f, 0.2f);
+								animation.setDuration(9000);
+								animation.setFillAfter(false);
+
+								subList.getChildAt(position).startAnimation(
+										animation);
+								makeblur = true;
+								Handler mHandler = new Handler();
+								Runnable _run = new Runnable() {
+									@Override
+									public void run() {
+										// if(position !=
+										// AbsListView.INVALID_POSITION){
+										// childList.remove(position);
+										// }
+										// else groupList.remove(position);
+										taomoi_scroll = true;
+										makeblur = false;
+									}
+								};
+								mHandler.postDelayed(_run, 9000);
+							}
+
+						}
+
+						@Override
+						public boolean canDismiss(int position) {
+							// TODO Auto-generated method stub
+							return true;
+						}
+					});
+			subList.setOnTouchListener(touchListener);
+			subList.setOnScrollListener(touchListener.makeScrollListener());
+			subList.setAdapter(tab1adpt);
+			tab1adpt.notifyDataSetChanged();
+
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	// for menu
+
 }
-
