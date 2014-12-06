@@ -23,10 +23,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.animation.AlphaAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -38,6 +40,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.pj3.pos.R;
 import com.pj3.pos.res_public.FoodStatistic;
@@ -50,7 +53,6 @@ public class WaiterMainActivity extends Activity {
 
 	// du lieu mon an cua 1 order
 	public ArrayList<FoodStatistic> listOrderDetail;
-	public ArrayList<FoodStatistic> hehe = new ArrayList<FoodStatistic>();
 
 	public ArrayAdapter<String> aaTable, aaTurn;
 	public OrderAdapter aaOrder;
@@ -105,7 +107,7 @@ public class WaiterMainActivity extends Activity {
 	}
 
 	public void tab2() {
-	
+
 		btThemMon = (Button) findViewById(R.id.btThemMon);
 		btThemMon.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -150,6 +152,7 @@ public class WaiterMainActivity extends Activity {
 				android.R.layout.simple_list_item_1, arrTable);
 		spTable.setAdapter(aaTable);
 		lvOrder = (ListView) findViewById(R.id.lvOrder);
+		registerForContextMenu(lvOrder);
 		aaOrder = new OrderAdapter(this, R.layout.waiter_tab2_item_order,
 				listOrder);
 		lvOrder.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -162,6 +165,15 @@ public class WaiterMainActivity extends Activity {
 				Intent itGridFood = new Intent(WaiterMainActivity.this,
 						WaiterOrderGridfood.class);
 				startActivityForResult(itGridFood, 111);
+			}
+		});
+		lvOrder.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				
+				return false;
 			}
 		});
 		lvOrder.setAdapter(aaOrder);
@@ -180,7 +192,7 @@ public class WaiterMainActivity extends Activity {
 				R.layout.waiter_tab2_item_food, listOrderDetail);
 		lv_order_detail.setAdapter(aaFood);
 	}
-	
+
 	// nhan du lieu tu viec chon mon
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -259,11 +271,9 @@ public class WaiterMainActivity extends Activity {
 
 	// event click button ThemMoi
 	public void click_AddOrder(View v) {
-		// Toast.makeText(getBaseContext(), "hehe", Toast.LENGTH_LONG).show();
-		// Tam thoi the nay da, chua xu ly duoc luot
-		listOrder.add("Bàn " + idBanOrder + " Lượt n");
+		listOrder
+				.add("Bàn " + idBanOrder + " Lượt " + getTableTurn(idBanOrder));
 		aaOrder.notifyDataSetChanged();
-
 	}
 
 	static class OrderHolder {
@@ -523,6 +533,51 @@ public class WaiterMainActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	// for menu
+	@Override
+public void onCreateContextMenu(ContextMenu menu, View v,
+		ContextMenuInfo menuInfo) {
+	super.onCreateContextMenu(menu, v, menuInfo);
+	getMenuInflater().inflate(R.menu.waiter_tab2_contextmenu, menu);
+}
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		if(item.getItemId() == R.id.thanhtoan)
+		{
+			Toast.makeText(getBaseContext(),"Thanh toan",Toast.LENGTH_SHORT).show();
+		}
+		return super.onContextItemSelected(item);	
+	}
 
+	// chi dung de tang luot cho ban
+	private class tableChoose {
+		int tableIndex;
+		int tableTurn;
+
+		public tableChoose(int tableIndex, int tableTurn) {
+			this.tableIndex = tableIndex;
+			this.tableTurn = tableTurn;
+		}
+	}
+
+	private ArrayList<tableChoose> arrTableTurn = new ArrayList<WaiterMainActivity.tableChoose>();
+
+	private int getTableTurn(int tableIndex) {
+		int result = 1;
+		boolean isExist = false;
+		for (int i = 0; i < arrTableTurn.size(); i++) {
+			tableChoose tc = arrTableTurn.get(i);
+			if (tc.tableIndex == tableIndex) {
+				result = tc.tableTurn + 1;
+				tc.tableTurn++;
+				isExist = true;
+				break;
+			}
+
+		}
+		if (!isExist) {
+			tableChoose tc = new tableChoose(tableIndex, 1);
+			arrTableTurn.add(tc);
+		}
+		return result;
+	}
 }
