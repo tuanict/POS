@@ -1,11 +1,13 @@
 package com.pj3.pos.waiter;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -14,6 +16,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.restlet.resource.Options;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -22,6 +25,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,11 +42,10 @@ import android.widget.Toast;
 import com.pj3.pos.R;
 import com.pj3.pos.res_public.Food;
 import com.pj3.pos.res_public.FoodStatistic;
-import com.pj3.pos.waiter.WaiterMainActivity.GetMenuAsyncTask;
 
 public class WaiterOrderGridfood extends Activity {
 	private GridView gvFood;
-	private ArrayList<Food> data = new ArrayList<Food>();
+	private ArrayList<Food> data;
 	private GridfoodAdapter aa;
 	private ArrayList<String> arrFoodOption = new ArrayList<String>();
 	private Intent intent;
@@ -50,21 +53,14 @@ public class WaiterOrderGridfood extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.waiter_tab2_gridfood);
+		data = new ArrayList<Food>();
+		getListFoodFS();
 		intent = getIntent();
 		gvFood = (GridView) findViewById(R.id.gvfood);
-		getListFoodFS();
-		Food a = new Food(1, "Coffee", 20, null, true);
-		Food b = new Food(1, "A1", 20, null, true);
-		Food c = new Food(1, "A2", 20, null, true);
-		Food d = new Food(1, "A3", 20, null, true);
-		Food e = new Food(1, "A4", 20, null, true);
-		Food f = new Food(1, "A5", 20, null, true);
-		data.add(a);
-		data.add(b);
-		data.add(c);
-		data.add(d);
-		data.add(e);
-		data.add(f);
+
+		// Food a = new Food(1, "Coffee", 20, null, true);
+		// data.add(a);
+
 		aa = new GridfoodAdapter(this, R.layout.waiter_tab2_gridfood_item, data);
 		gvFood.setAdapter(aa);
 		gvFood.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -75,11 +71,15 @@ public class WaiterOrderGridfood extends Activity {
 				String nameFood = data.get(position).getM_name();
 				arrFoodOption.clear();
 				// nho gan du lieu cho arrFoodOption lay tu doi tuong Food
-				String option1 = "Không đường";
-				String option2 = "Không đá";
-				arrFoodOption.add(option1);
-				arrFoodOption.add(option2);
-
+				// String option1 = "Không đường";
+				// String option2 = "Không đá";
+				// arrFoodOption.add(option1);
+				// arrFoodOption.add(option2);
+//				if (!data.get(position).getM_option().equals(""))
+//					arrFoodOption = splitFoodOption(data.get(position)
+//							.getM_option());
+				arrFoodOption = splitFoodOption(data.get(position)
+						.getM_option());
 				AlertDialog.Builder ad = new AlertDialog.Builder(
 						WaiterOrderGridfood.this);
 				ad.setTitle(nameFood);
@@ -193,30 +193,48 @@ public class WaiterOrderGridfood extends Activity {
 		protected String doInBackground(String... urls) {
 			return GET(urls[0]);
 		}
-//nap data cho ArrayList data
+
+		// nap data cho ArrayList data o day
 		@Override
-		protected void onPostExecute(String result) {		
+		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
-			
+
 			JSONObject json = null;
 			try {
+				// ep kieu ve JSONObject
 				json = new JSONObject(result);
 				JSONArray menu = json.getJSONArray("m_array");
-				for(int i=0; i<menu.length(); i++)
-				{
-					
+				for (int i = 0; i < menu.length(); i++) {
+					JSONObject jObject = menu.getJSONObject(i);
+					String f_id = jObject.getString("f_id");
+					String f_name = jObject.getString("f_name");
+					String f_price = jObject.getString("f_price");
+					String f_image = jObject.getString("f_image");
+					String f_status = jObject.getString("f_status");
+					String f_option = jObject.getString("f_option");
+					Food food = new Food();
+					int f_id_int = Integer.parseInt(f_id);
+					int f_price_int = Integer.parseInt(f_price);
+
+					food.setM_name(f_name);
+					if (f_option != null)
+						food.setM_option(f_option);
+					else
+						food.setM_option("");
+					food.setM_food_id(f_id_int);
+					food.setM_price(f_price_int);
+					data.add(food);
 				}
-				
-//				menu.getJSONObject(0);
+				// menu.getJSONObject(0);
 				// get first article keys [title,url,categories,tags]
-//				menu.getJSONObject(0).names();
+				// menu.getJSONObject(0).names();
 				// return an article title
-//				String titledemo = menu.getJSONObject(0).getString("title");
-//
-//				JSONArray arrayTags = articles
-//							.getJSONObject(0).getJSONArray("tags");
-//					String android = arrayTags.get(0);
-				//lay phan tu dau tien trong mang 'tags'
+				// String titledemo = menu.getJSONObject(0).getString("title");
+				//
+				// JSONArray arrayTags = articles
+				// .getJSONObject(0).getJSONArray("tags");
+				// String android = arrayTags.get(0);
+				// lay phan tu dau tien trong mang 'tags'
 
 			} catch (JSONException e) {
 				// Toast.makeText(getBaseContext(),"Cann't convert json to String!"+e.toString(),Toast.LENGTH_LONG).show();
@@ -230,13 +248,14 @@ public class WaiterOrderGridfood extends Activity {
 		InputStream inputStream = null;
 		String result = "";
 		try {
-			// create HttpClient
-			HttpClient httpclient = new DefaultHttpClient();
-			// make GET request to the given URL
-			HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
-
-			// receive response as inputStream
-			inputStream = httpResponse.getEntity().getContent();
+			// HttpClient httpclient = new DefaultHttpClient();
+			// HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
+			// inputStream = httpResponse.getEntity().getContent();
+			// dung de test
+			String pathOfFile = Environment.getExternalStorageDirectory()
+					.getAbsolutePath();
+			pathOfFile += "/Download/menu.json";
+			inputStream = new FileInputStream(pathOfFile);
 
 			// convert inputstream to string
 			if (inputStream != null)
@@ -244,10 +263,11 @@ public class WaiterOrderGridfood extends Activity {
 			else
 				result = "Did not work!";
 		} catch (Exception e) {
-			Log.d("InputStream", e.getLocalizedMessage());
+			Log.d("hehe", "Loi trong ham Get: " + e.toString());
 		}
 		return result;
 	}
+
 	private static String convertInputStreamToString(InputStream inputStream)
 			throws IOException {
 		BufferedReader bufferedReader = new BufferedReader(
@@ -256,9 +276,23 @@ public class WaiterOrderGridfood extends Activity {
 		String result = "";
 		while ((line = bufferedReader.readLine()) != null)
 			result += line;
-
 		inputStream.close();
 		return result;
 
+	}
+
+	// tach option theo dau ","
+	public ArrayList<String> splitFoodOption(String roughOption) {
+		ArrayList<String> result = new ArrayList<String>();
+		// test
+//		roughOption = "dog,cat,fish";
+
+		StringTokenizer line = new StringTokenizer(roughOption, ",");
+		int count = line.countTokens();
+		for (int i = 0; i < count; i++) {
+			String items = line.nextToken();
+			result.add(items);
+		}
+		return result;
 	}
 }
